@@ -41,7 +41,7 @@ class Logger():
         if self.mode not in Logger._mode_list: 
             raise Exception(f"{self.mode} is not a valid mode. Try one of these instead: {Logger._mode_list}")
         
-    def _check_category(self, category: _LogCategory) -> bool:
+    def _check_category(self, category: _LogCategory | str) -> bool:
         return True if category in Logger._category_list else False
     
     def _get_indent(self) -> int:
@@ -49,15 +49,23 @@ class Logger():
         return indent
     
     def _break_massage(self, massage: str, indent: int) -> str:
+        def _get_break_index(space_inidces: list[int], target_index: int) -> int:
+            filtered_indices = [index for index in space_inidces if index <= target_index]
+            return filtered_indices[-1]
+
         if indent + len(massage) <= Logger._terminal_width: return massage
         else:
-            for i in range(Logger._terminal_width - indent, len(massage), Logger._terminal_width - indent):
-                print(i)
-                massage = massage[:i] + f"\n{' '*indent}" + massage[i:]
+            for i in range(Logger._terminal_width - indent, len(massage), Logger._terminal_width):
+              
+                space_indices: list = [index for index, char in enumerate(massage) if char == " "]
+                break_index = _get_break_index(space_indices, i)
+                massage = massage[:break_index] + f"\n{' '*indent}" + massage[break_index+1:]
+               
             return massage
+
         
 
-    def log(self, massage: str, category: _LogCategory = default) -> None:
+    def log(self, massage: str, category: _LogCategory | str = default) -> None:
 
         is_existing_category = self._check_category(category)
         indent = self._get_indent()

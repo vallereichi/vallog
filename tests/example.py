@@ -32,7 +32,7 @@ def main():
     release.log("custom massage", "CUSTOM") 
 
     print("\nLONG TEXT gets wrapped around like this")
-    debug.log("this is some really long text. But at the end of the line (depending on the terminal width) it gets wrapped around and has the same indentation as the start of this massage. The Linebreak should also not break words apart but instead break at the end of a word")
+    debug.log("this is some really long text. But at the end of the line (depending on the terminal width) it gets wrapped around and has the same indentation as the start of this massage. The Linebreak should also not break words apart but instead break at the end of a word. And of course this should also work for multiple line breaks and completely independant of the terminal size")
     
         
 
