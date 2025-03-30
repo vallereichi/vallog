@@ -5,3 +5,4 @@ info    = Logger.info
 warning = Logger.warning
 error   = Logger.error
 debug   = Logger.debug
+header  = Logger.header 

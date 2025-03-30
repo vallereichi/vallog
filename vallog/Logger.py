@@ -22,14 +22,18 @@ class Logger():
             self.color = color 
             self.mode = mode
 
+        def __len__(self) -> int:
+            return len(self.name)
+
 
     default =    _LogCategory("Default" , _ansi_colors["white"]                 )
     info    =    _LogCategory("Info"    , _ansi_colors["green"]                 )
     warning =    _LogCategory("Warning" , _ansi_colors["purple"]                )
     error   =    _LogCategory("Error"   , _ansi_colors["red"]                   )
     debug   =    _LogCategory("Debug"   , _ansi_colors["blue"],     ["Debug"]   )
+    header =     _LogCategory("Heading" , _ansi_colors["bold"] + _ansi_colors["cyan"])
  
-    _category_list: list[_LogCategory] = [default, info, warning, error, debug]
+    _category_list: list[_LogCategory] = [default, info, warning, error, debug, header]
 
 
     def __init__(self, mode: str = "Debug"):
@@ -65,17 +69,41 @@ class Logger():
 
         
 
-    def log(self, massage: str, category: _LogCategory | str = default) -> None:
+    def log(self, massage: str, category: _LogCategory | str = default, display_category: bool = True, colored_text: bool = False) -> None:
 
         is_existing_category = self._check_category(category)
+     
+        if not is_existing_category:
+            category = Logger._LogCategory(category, Logger._ansi_colors["white"])
+
         indent = self._get_indent()
         massage = self._break_massage(massage, indent)
-
-        if not is_existing_category:
+        
+        prefix = ""
+        spacing = indent
+        if display_category:
+            prefix = f"[{category.color}{category.name}{Logger._ansi_colors["white"]}]"
             spacing = indent - (len(category) + 2)
-            print(f"[{category}]{' '*spacing}{massage}")
 
-        elif self.mode in category.mode:
-            spacing = indent - (len(category.name) + 2)
-            print(f"[{category.color}{category.name}{Logger._ansi_colors["white"]}]{' '*spacing}{massage}")
-            
+        text_color = category.color if colored_text else Logger._ansi_colors["white"]        
+        
+        if self.mode in category.mode:
+            print(f"{prefix}{' '*spacing}{text_color}{massage}{Logger._ansi_colors["white"]}")
+
+
+
+    def sep(self, char: str = "=") -> None:
+        char = char[0] if len(char) > 0 else "="   
+        print(f"\n\n{char*Logger._terminal_width}\n")
+
+    def heading(self, massage: str) -> None:
+        indent = self._get_indent()
+        massage = f'\n{' '*indent}' + massage
+        self.log(massage, Logger.header, display_category=False, colored_text=True)
+
+        
+
+        
+
+
+        
