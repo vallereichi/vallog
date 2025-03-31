@@ -32,6 +32,9 @@ class Logger:
         def __len__(self) -> int:
             return len(self.name)
 
+        def __repr__(self):
+            return self.name + ":\tcolor=" + self.color + "\tmode=" + self.mode
+
     default = _LogCategory("Default", _ansi_colors["white"])
     info = _LogCategory("Info", _ansi_colors["green"])
     warning = _LogCategory("Warning", _ansi_colors["purple"])
@@ -52,7 +55,7 @@ class Logger:
             )
 
     def _check_category(self, category: _LogCategory | str) -> bool:
-        return True if category in Logger._category_list else False
+        return category in Logger._category_list
 
     def _get_indent(self) -> int:
         indent = (
@@ -71,20 +74,19 @@ class Logger:
 
         if indent + len(massage) <= Logger._terminal_width:
             return massage
-        else:
-            for i in range(
-                Logger._terminal_width - indent, len(massage), Logger._terminal_width
-            ):
 
-                space_indices: list = [
-                    index for index, char in enumerate(massage) if char == " "
-                ]
-                break_index = _get_break_index(space_indices, i)
-                massage = (
-                    massage[:break_index]
-                    + f"\n{' '*indent}"
-                    + massage[break_index + 1 :]
-                )
+        for i in range(
+            Logger._terminal_width - indent, len(massage), Logger._terminal_width
+        ):
+            space_indices: list = [
+                index for index, char in enumerate(massage) if char == " "
+            ]
+            break_index = _get_break_index(space_indices, i)
+            massage = (
+                massage[:break_index]
+                + f"\n{' '*indent}"
+                + massage[break_index + 1 :]
+            )
 
             return massage
 
