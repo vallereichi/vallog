@@ -1,5 +1,10 @@
 {
-    "black-formatter.args": [
-        "--line-lenght=100"
-    ]
+    "pylint.args": [
+        "--disable=C0301",
+        "--disable=C0413"
+    ],
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.defaultFoldingRangeProvider": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "black-formatter.args": ["--line-length", "119"],
 }
