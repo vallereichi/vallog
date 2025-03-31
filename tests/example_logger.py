@@ -6,7 +6,7 @@ import sys
 sys.path.append('/home/vallereichi/vallog/')
 
 import vallog as vl
-from vallog.Logger import Logger
+from vallog.logger import Logger
 
 
 

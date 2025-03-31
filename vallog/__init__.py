@@ -3,7 +3,7 @@ importing Logger module
 make variables accessible to the user
 """
 
-from vallog.Logger import Logger
+from vallog.logger import Logger
 
 default = Logger.default
 info    = Logger.info
