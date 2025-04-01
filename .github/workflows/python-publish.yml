@@ -9,14 +9,15 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [published]
+  pull_request:
+    types: closed
 
 permissions:
   contents: read
 
 jobs:
   release-build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
