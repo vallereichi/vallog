@@ -95,6 +95,13 @@ jobs:
           name: release-dists
           path: dist/
 
+      - name: Retrieve pyproject.toml
+        uses: action/download-artifact@v4
+        with:
+          name: pyproject-file
+          path: .
+
+
       - name: list files
         run: ls -la
 
