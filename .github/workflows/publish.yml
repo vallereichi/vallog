@@ -80,15 +80,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch full history to avoid issues with tags and branches
-
-      - name: Download artifacts
+      - name: Retrieve release distributions
         uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: release-dists
           path: dist/
 
       - name: Extract version from pyproject.toml
