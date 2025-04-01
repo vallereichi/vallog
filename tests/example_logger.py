@@ -2,10 +2,6 @@
 example file on how to use the vallog Logger module
 """
 
-import sys
-
-sys.path.append("/home/vallereichi/vallog/")
-
 import vallog as vl
 from vallog.logger import Logger
 
@@ -55,6 +51,18 @@ def main():
         "this is some really long text. But at the end of the line (depending on the terminal width) it gets wrapped around and has the same indentation as the start of this massage. The Linebreak should also not break words apart but instead break at the end of a word. And of course this should also work for multiple line breaks and completely independant of the terminal size",
         vl.info,
     )
+
+    debug.heading("CUSTOM CATEGORIES")
+    debug.add_category("USR_CAT", "red", ["Debug", "Release"])
+    debug.log(
+        "This is how the user can add new categories. Note that new categories are limited to a Logger instance",
+        debug.USR_CAT,
+    )
+    new_cat = vl.Logger.LogCategory("NEW_CAT", "yellow")
+    debug.log("custom categories can also be created like this. But you may loose some functionalities", new_cat)
+    debug.log("And of course there is also coloured massages", new_cat, colored_text=True)
+
+    debug.list_categories()
 
     release.sep()
 
