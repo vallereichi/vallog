@@ -8,13 +8,13 @@
 
 name: Upload Python Package
 
-#on:
-#  pull_request:
-#    branches: main
-#    types: closed
 on:
-  push:
-    branches: main
+ pull_request:
+   branches: main
+   types: closed
+# on:
+#   push:
+#     branches: main
 
 
 
@@ -41,6 +41,12 @@ jobs:
         with:
           name: release-dists
           path: dist/
+
+      - name: Upload pyproject.toml
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyproject-file
+          path: pyproject.toml
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -83,11 +89,21 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Retrieve release distributions
         uses: actions/download-artifact@v4
         with:
           name: release-dists
           path: dist/
+
+      - name: Retrieve pyproject.toml
+        uses: actions/download-artifact@v4
+        with:
+          name: pyproject-file
+          path: .
+
 
       - name: list files
         run: ls -la
