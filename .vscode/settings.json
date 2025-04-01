@@ -1,7 +1,9 @@
 {
     "pylint.args": [
         "--disable=C0301",
-        "--disable=C0413"
+        "--disable=C0413",
+        "--disable=C0201",
+        "--disable=E1101",
     ],
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.defaultFoldingRangeProvider": "ms-python.black-formatter",
