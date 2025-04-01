@@ -9,6 +9,7 @@
 name: Upload Python Package
 
 on:
+
  pull_request:
    branches: main
    types: closed
@@ -18,9 +19,65 @@ on:
 
 
 
+env:
+  PACKAGE_NAME: "vallog"
+  OWNER: "vallereichi"
+
 jobs:
+  details:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.release.outputs.new_version }}
+      suffix: ${{ steps.release.outputs.suffix }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Extract tag and Details
+        id: release
+        run: |
+          if [ "${{ github.ref_type }}" = "branch" ]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+            SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+            echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+            echo "Version is $NEW_VERSION"
+            echo "Suffix is $SUFFIX"
+            echo "Tag name is $TAG_NAME"
+          else
+            echo "No tag found"
+            exit 1
+          fi
+
+  check_pypi:
+    needs: details
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch information from PyPI
+        run: |
+          response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+          latest_previous_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
+          if [ -z "$latest_previous_version" ]; then
+            echo "Package not found on PyPI."
+            latest_previous_version="0.0.0"
+          fi
+          echo "Latest version on PyPI: $latest_previous_version"
+          echo "latest_previous_version=$latest_previous_version" >> $GITHUB_ENV
+      - name: Compare versions and exit if not newer
+        run: |
+          NEW_VERSION=${{ needs.details.outputs.new_version }}
+          LATEST_VERSION=$latest_previous_version
+          if [ "$(printf '%s\n' "$LATEST_VERSION" "$NEW_VERSION" | sort -rV | head -n 1)" != "$NEW_VERSION" ] || [ "$NEW_VERSION" == "$LATEST_VERSION" ]; then
+            echo "The new version $NEW_VERSION is not greater than the latest version $LATEST_VERSION on PyPI."
+            exit 1
+          else
+            echo "The new version $NEW_VERSION is greater than the latest version $LATEST_VERSION on PyPI."
+          fi
+
   release-build:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -42,11 +99,13 @@ jobs:
           name: release-dists
           path: dist/
 
+
       - name: Upload pyproject.toml
         uses: actions/upload-artifact@v4
         with:
           name: pyproject-file
           path: pyproject.toml
+
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -81,10 +140,7 @@ jobs:
 
   github_release:
     name: Create GitHub Release
-    needs: [release-build]
-    environment: 
-      name: release
-
+    needs: [release-build, details]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -92,11 +148,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Retrieve release distributions
+
+      - name: Retrieve release distribution
         uses: actions/download-artifact@v4
         with:
-          name: release-dists
+          name: dist
           path: dist/
+
 
       - name: Retrieve pyproject.toml
         uses: actions/download-artifact@v4
@@ -116,9 +174,8 @@ jobs:
   
       - name: Create Git tag
         run: |
-          git tag v${{ env.VERSION }}
-          git push origin v${{ env.VERSION }}
-  
+            git tag v${{ env.VERSION }}
+            git push origin v${{ env.VERSION }}
 
       - name: Create GitHub release
         uses: actions/create-release@v1
