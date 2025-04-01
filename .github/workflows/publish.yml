@@ -8,10 +8,13 @@
 
 name: Upload Python Package
 
+#on:
+#  pull_request:
+#    branches: main
+#    types: closed
 on:
-  pull_request:
+  push:
     branches: main
-    types: closed
 
 
 
@@ -85,6 +88,9 @@ jobs:
         with:
           name: release-dists
           path: dist/
+
+      - name: list files
+        run: ls -la
 
       - name: Extract version from pyproject.toml
         id: extract_version
