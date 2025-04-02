@@ -97,7 +97,6 @@ jobs:
       - name: Create GitHub release
         uses: actions/create-release@v1
         with:
-          token: ${{ secrets.GH_TOKEN }}
           tag_name: v${{ steps.extract_version.outputs.VERSION }}
           release_name: Release v${{ steps.extract_version.outputs.VERSION }}
           draft: false
