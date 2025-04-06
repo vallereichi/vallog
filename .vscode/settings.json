@@ -8,5 +8,9 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.defaultFoldingRangeProvider": "ms-python.black-formatter",
     "editor.formatOnSave": true,
-    "black-formatter.args": ["--line-length", "119"],
+    "black-formatter.args": [
+        "--line-length",
+        "119"
+    ],
+    "github.copilot.editor.enableAutoCompletions": false,
 }
