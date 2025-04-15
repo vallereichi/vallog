@@ -23,6 +23,11 @@ class Timer:
 
     def __exit__(self, exc_type, exc_value, traceback) -> float:
         """stop the timer"""
+        if exc_type:
+            print(exc_type)
+            print(f"An exception occured: {exc_value}")
+            print(traceback)
+
         elapsed_time: float = self.stop_timer()
         self.elapsed_time = elapsed_time
         return elapsed_time
