@@ -66,6 +66,19 @@ def main():
 
     release.sep()
 
+    debug.heading("Supress all output to the Terminal with 'cout = False'")
+    test = vl.Logger("Test", cout=True)
+    test.log(
+        "this Test mode will only display Warnings, Errors and Default messages so that annoying infos dont get printed in large test runs",
+        vl.warning,
+    )
+    test.log("Here is some text that wont get printed", vl.info)
+    test.toggle_cout()
+    test.log("Now that cout is turned off nothing will get printed to the terminal", vl.error)
+    test.sep("?")
+    test.toggle_cout()
+    test.sep()
+
 
 if __name__ == "__main__":
     main()
