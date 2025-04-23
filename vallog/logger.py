@@ -21,7 +21,7 @@ class Logger:
     """Logger class"""
 
     _terminal_width = shutil.get_terminal_size().columns
-    _mode_list: list[str] = ["Debug", "Release"]
+    _mode_list: list[str] = ["Debug", "Release", "Test"]
 
     class LogCategory:
         """
@@ -32,7 +32,7 @@ class Logger:
             self.name = name
             self.clr_str = color
             self.color = _ansi_colors[color] if color in _ansi_colors.keys() else color
-            self.mode = mode if mode is not None else ["Debug", "Release"]
+            self.mode = mode if mode is not None else ["Debug", "Release", "Test"]
 
         def __len__(self) -> int:
             return len(self.name)
@@ -41,7 +41,7 @@ class Logger:
             return self.name + ":\tcolor=" + self.clr_str + "\tmode=" + str(self.mode)
 
     default = LogCategory("Default", "white")
-    info = LogCategory("Info", "green")
+    info = LogCategory("Info", "green", ["Debug", "Release"])
     warning = LogCategory("Warning", "purple")
     error = LogCategory("Error", "red")
     debug = LogCategory("Debug", "blue", ["Debug"])
@@ -50,14 +50,15 @@ class Logger:
 
     _category_list: list[LogCategory] = [default, info, warning, error, debug, header]
 
-    def __init__(self, mode: str = "Debug"):
+    def __init__(self, mode: str = "Debug", cout: bool = True):
+        self._check_mode(mode)
+        self.cout = cout
         self.mode = mode
-        self._check_mode()
         self.usr_categories = {}
 
-    def _check_mode(self) -> None:
-        if self.mode not in Logger._mode_list:
-            raise ValueError(f"{self.mode} is not a valid mode. Try one of these instead: {Logger._mode_list}")
+    def _check_mode(self, mode: str) -> None:
+        if mode not in Logger._mode_list:
+            raise ValueError(f"{mode} is not a valid mode. Try one of these instead: {Logger._mode_list}")
 
     def _check_category(self, category: LogCategory | str) -> bool:
         return (
@@ -116,7 +117,7 @@ class Logger:
 
         text_color = category.color if colored_text else _ansi_colors["white"]
 
-        if self.mode in category.mode:
+        if self.mode in category.mode and self.cout:
             print(f"{prefix}{' '*spacing}{text_color}{massage}{_ansi_colors["white"]}")
 
     def sep(self, char: str = "=") -> None:
@@ -124,7 +125,8 @@ class Logger:
         create a seperation in the terminal output. Provide a 'char' for custom seperation line
         """
         char = char[0] if len(char) > 0 else "="
-        print(f"\n\n{char*Logger._terminal_width}\n")
+        if self.cout:
+            print(f"\n\n{char*Logger._terminal_width}\n")
 
     def heading(self, massage: str) -> None:
         """
@@ -155,3 +157,7 @@ class Logger:
         for cat in self.usr_categories.values():
 
             self.log(str(cat), cat)
+
+    def toggle_cout(self) -> None:
+        """toggle terminal output"""
+        self.cout = not self.cout
